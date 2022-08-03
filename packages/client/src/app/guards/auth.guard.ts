@@ -9,7 +9,7 @@ import {
 import { Observable, of, throwError } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { AuthState, AuthStateModel } from '../store/auth/auth.state';
-import { catchError, distinct, map, switchMap, take } from 'rxjs/operators';
+import { catchError, map, switchMap, take } from 'rxjs/operators';
 import { AuthAction } from '../store/auth/auth.action';
 
 @Injectable({

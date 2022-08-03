@@ -1,23 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   BoardItemStateModel,
   BoardsState,
   BoardsStateModel,
 } from '../../../../store/boards/boards.state';
-import {
-  concatMap,
-  distinct,
-  filter,
-  map,
-  mergeMap,
-  publish,
-  startWith,
-  switchMap,
-  tap,
-} from 'rxjs/operators';
-import { ActivatedRoute, Route } from '@angular/router';
+import { distinct, map } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 import { FormControl, FormGroup } from '@angular/forms';
 import { BoardsAction } from '../../../../store/boards/boards.action';
 
