@@ -56,6 +56,7 @@ export class GitHubGraphQLService {
   }
 
   async projectByOrgs(login: string, number: number) {
+    console.log({ login, number });
     return await this.client.query<GetProjectsQuery, GetProjectsQueryVariables>(
       {
         query: GetProjectsDocument,
@@ -67,8 +68,12 @@ export class GitHubGraphQLService {
     );
   }
 
-  async getProjectIssues(login: string, number: number) {
-    const result = await this.client.query<
+  async getProjectIssues(
+    login: string,
+    number: number,
+    endCursor: string | undefined = '',
+  ) {
+    return await this.client.query<
       GetProjectIssuesQuery,
       GetProjectIssuesQueryVariables
     >({
@@ -76,11 +81,8 @@ export class GitHubGraphQLService {
       variables: {
         login,
         number,
+        endCursor,
       },
     });
-    if (!result.data.organization) return;
-    if (!result.data?.organization?.projectNext?.__typename) return;
-    if (!result.data.organization.projectNext.items) return;
-    result.data.organization.projectNext.items;
   }
 }

@@ -1,7 +1,11 @@
-query getProjectIssues($login: String!, $number: Int!) {
+query getProjectIssues($login: String!, $number: Int!, $endCursor: String!) {
   organization(login: $login) {
     projectNext(number: $number) {
-      items(last: 100) {
+      items(last: 100, after: $endCursor) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
         nodes {
           id
           fieldValues(first: 10) {
@@ -14,6 +18,17 @@ query getProjectIssues($login: String!, $number: Int!) {
             }
           }
           content {
+            ... on DraftIssue {
+              id
+              title
+              assignees(first: 1) {
+                nodes {
+                  avatarUrl
+                  login
+                  name
+                }
+              }
+            }
             ... on Issue {
               id
               title
