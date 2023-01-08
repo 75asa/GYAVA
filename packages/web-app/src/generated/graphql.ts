@@ -25798,6 +25798,7 @@ export type WorkflowRunPendingDeploymentRequestsArgs = {
 export type GetProjectIssuesQueryVariables = Exact<{
   login: Scalars['String'];
   number: Scalars['Int'];
+  endCursor: Scalars['String'];
 }>;
 
 export type GetProjectIssuesQuery = {
@@ -25808,6 +25809,11 @@ export type GetProjectIssuesQuery = {
       __typename?: 'ProjectNext';
       items: {
         __typename?: 'ProjectNextItemConnection';
+        pageInfo: {
+          __typename?: 'PageInfo';
+          hasNextPage: boolean;
+          endCursor?: string | null;
+        };
         nodes?: Array<{
           __typename?: 'ProjectNextItem';
           id: string;
@@ -25824,7 +25830,20 @@ export type GetProjectIssuesQuery = {
             } | null> | null;
           };
           content?:
-            | { __typename?: 'DraftIssue' }
+            | {
+                __typename?: 'DraftIssue';
+                id: string;
+                title: string;
+                assignees: {
+                  __typename?: 'UserConnection';
+                  nodes?: Array<{
+                    __typename?: 'User';
+                    avatarUrl: any;
+                    login: string;
+                    name?: string | null;
+                  } | null> | null;
+                };
+              }
             | {
                 __typename?: 'Issue';
                 id: string;
@@ -25873,6 +25892,11 @@ export type GetProjectsQuery = {
       };
       items: {
         __typename?: 'ProjectNextItemConnection';
+        pageInfo: {
+          __typename?: 'PageInfo';
+          hasNextPage: boolean;
+          endCursor?: string | null;
+        };
         nodes?: Array<{
           __typename?: 'ProjectNextItem';
           id: string;
@@ -25889,7 +25913,20 @@ export type GetProjectsQuery = {
             } | null> | null;
           };
           content?:
-            | { __typename?: 'DraftIssue' }
+            | {
+                __typename?: 'DraftIssue';
+                id: string;
+                title: string;
+                assignees: {
+                  __typename?: 'UserConnection';
+                  nodes?: Array<{
+                    __typename?: 'User';
+                    avatarUrl: any;
+                    login: string;
+                    name?: string | null;
+                  } | null> | null;
+                };
+              }
             | {
                 __typename?: 'Issue';
                 id: string;
@@ -25927,10 +25964,14 @@ export type WhoAmIQuery = {
 };
 
 export const GetProjectIssuesDocument = gql`
-  query getProjectIssues($login: String!, $number: Int!) {
+  query getProjectIssues($login: String!, $number: Int!, $endCursor: String!) {
     organization(login: $login) {
       projectNext(number: $number) {
-        items(last: 100) {
+        items(last: 100, after: $endCursor) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           nodes {
             id
             fieldValues(first: 10) {
@@ -25943,6 +25984,17 @@ export const GetProjectIssuesDocument = gql`
               }
             }
             content {
+              ... on DraftIssue {
+                id
+                title
+                assignees(first: 1) {
+                  nodes {
+                    avatarUrl
+                    login
+                    name
+                  }
+                }
+              }
               ... on Issue {
                 id
                 title
@@ -25990,7 +26042,11 @@ export const GetProjectsDocument = gql`
             settings
           }
         }
-        items(last: 100) {
+        items(first: 100) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           nodes {
             id
             fieldValues(first: 10) {
@@ -26003,6 +26059,17 @@ export const GetProjectsDocument = gql`
               }
             }
             content {
+              ... on DraftIssue {
+                id
+                title
+                assignees(first: 1) {
+                  nodes {
+                    avatarUrl
+                    login
+                    name
+                  }
+                }
+              }
               ... on Issue {
                 id
                 title

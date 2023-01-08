@@ -28,10 +28,33 @@ export class BoardsState {
     ctx: StateContext<BoardsStateModel>,
     action: BoardsAction.addOrgProject,
   ) {
+    let hasMoreItems = false;
+    const projectNextList = [];
     const result = await this.githubClient.projectByOrgs(
       action.org,
       action.number,
     );
+    if (result.data.organization?.projectNext) {
+      projectNextList.push(result.data.organization.projectNext);
+    }
+    hasMoreItems =
+      !!result.data.organization?.projectNext?.items.pageInfo.hasNextPage &&
+      !!result.data.organization?.projectNext?.items.pageInfo.endCursor;
+
+    if (hasMoreItems) {
+      do {
+        const hasMoreProject = await this.githubClient.getProjectIssues(
+          action.org,
+          action.number,
+          result.data.organization!.projectNext!.items.pageInfo.endCursor!,
+        );
+        projectNextList.push(hasMoreProject.data.organization?.projectNext);
+        hasMoreItems =
+          hasMoreProject.data.organization!.projectNext!.items.pageInfo
+            .hasNextPage;
+      } while (hasMoreItems);
+    }
+    console.log({ projectNextList });
     const state = ctx.getState();
     const boards = [...state.boards.map((r) => ({ ...r }))];
     const existing = boards.find((p) => {

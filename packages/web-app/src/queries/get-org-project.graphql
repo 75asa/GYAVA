@@ -10,7 +10,11 @@ query getProjects($login: String!, $number: Int!) {
           settings
         }
       }
-      items(last: 100) {
+      items(first: 100) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
         nodes {
           id
           fieldValues(first: 10) {
@@ -23,6 +27,17 @@ query getProjects($login: String!, $number: Int!) {
             }
           }
           content {
+            ... on DraftIssue {
+              id
+              title
+              assignees(first: 1) {
+                nodes {
+                  avatarUrl
+                  login
+                  name
+                }
+              }
+            }
             ... on Issue {
               id
               title
